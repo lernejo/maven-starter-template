@@ -1,0 +1,1 @@
+# maven_starter_template
