@@ -7,20 +7,27 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      - uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - run: |
-         java -version
-         echo $JAVA_HOME
-      - run: ./mvnw install
-      - uses: codecov/codecov-action@v1
+      - uses: actions/checkout@v4
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Debug JDK info
+        run: |
+          java -version
+          ./mvnw -version
+          echo $JAVA_HOME
+
+      - name: Run tests
+        run: ./mvnw verify
+
+      - uses: codecov/codecov-action@v4.5.0
+        env:
+          codecov_token: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ env.codecov_token != '' }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
